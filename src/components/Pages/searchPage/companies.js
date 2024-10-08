@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react';
 import Geography from '../../widgets/geography';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart';
+import GeographyDialog from '../../widgets/country';
 import _ from 'lodash';
 
 const SearchCompanies = () => {
@@ -535,7 +536,7 @@ const SearchCompanies = () => {
                         {data.data && data.data.length > 0 &&
                           <>
                           {data.data.map((item, index) => (
-                            <Box className="result-left-values" sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0.25)" }}>
+                            <Box className="result-left-values" sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0)" }}>
                               <Box className="result-column-value">
                                 <Checkbox className="search-checkbox"  checked={checkedItems[index] || false} onChange={handleCheckboxChange(index)} sx={{ '&.Mui-checked': {color: '#D9D9D9',},'&.MuiCheckbox-root': {borderColor: '#D9D9D9',},'& .MuiSvgIcon-root': {border: `1px solid #D9D9D9`, },}}/>
                                 <Typography className="result-column-title-text" >{index+1}</Typography>
@@ -575,7 +576,7 @@ const SearchCompanies = () => {
                       <Box className="result-column-title">
                         <Typography className="result-column-title-text" >Headcount</Typography>
                       </Box>
-                      <Box className="result-column-title">
+                      <Box className="result-column-title-medium">
                         <Typography className="result-column-title-text" >Key people</Typography>
                       </Box>
                     </Box>
@@ -593,7 +594,7 @@ const SearchCompanies = () => {
                           <>
                           {data.data.map((item, index) => (
                             <>
-                              <Box  className="result-right-values" onClick={()=>{setSelectedItemIdx(index)}}  sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0.25)" }}>
+                              <Box  className="result-right-values" onClick={()=>{setSelectedItemIdx(index)}}  sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0)" }}>
                                 <Box className="result-column-value-big">
                                   <Typography>{item.desc}</Typography>
                                 </Box>
@@ -603,23 +604,45 @@ const SearchCompanies = () => {
                                 </Box>
 
                                 <Box className="result-column-value">
-                                  <Typography>{item.geography}</Typography>
+                                {item.city && !/\d/.test(item.city) ? 
+                                  <Typography>{item.city}, {item.geography.replace("United States", "USA")}</Typography>
+                                  :
+                                  <Typography>{item.geography.replace("United States", "USA")}</Typography>
+                                  }
+                                  
                                 </Box>
 
                                 <Box className="result-column-value-medium">
-                                  <Typography>{item.website}</Typography>
+                                  {item.website && 
+                                  <Typography>
+                                    {item.website.length > 25 ? `${item.website.substring(0, 25)}...` : item.website}
+                                  </Typography>
+                                  }
+                                </Box>
+
+                                <Box className="result-column-value">
+                                  {item.revenues && item.revenues[0] && Math.abs(parseInt(item.revenues[0].toString().split('.')[0])) > 1000000 ?
+                                  <Typography>{item.revenues && item.revenues[0] && "$"+ (parseInt(item.revenues[0].toString().split('.')[0])/1000000).toFixed(2) + "Bn"}</Typography>
+                                  :
+                                  <Typography>{item.revenues && item.revenues[0] && "$"+ (parseInt(item.revenues[0].toString().split('.')[0])/1000).toFixed(0) + "M"}</Typography>
+                                  }
+                                  </Box>
+                                <Box className="result-column-value">
+                                  {item.ebitda && Math.abs(parseInt(item.ebitda.toString().split('.')[0])) > 1000000 ?
+                                  <Typography>{item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) && "$"+ (parseInt(item.ebitda.toString().split('.')[0])/1000000).toFixed(2) + "Bn"}</Typography>
+                                  :
+                                  <Typography>{item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) && "$"+ (parseInt(item.ebitda.toString().split('.')[0])/1000).toFixed(0) + "M"}</Typography>
+                                  }
                                 </Box>
                                 <Box className="result-column-value">
-                                  <Typography>{item.revenues && item.revenues[0] && "$"+item.revenues[0].toString().split('.')[0]+"M"}</Typography>
+                                  <Typography>{item.headcount && item.headcount.toLocaleString()}</Typography>
                                 </Box>
-                                <Box className="result-column-value">
-                                  <Typography>{item.ebitda && "$"+item.ebitda[0]+"M"}</Typography>
-                                </Box>
-                                <Box className="result-column-value">
-                                  <Typography>{item.headcount && item.headcount}</Typography>
-                                </Box>
-                                <Box className="result-column-value">
-                                  <Typography sx={{maxWidth:"150px", overflowX:"auto"}}>{item.key_people && item.key_people}</Typography>
+                                <Box className="result-column-value-medium">
+                                <Typography sx={{ maxWidth: "150px", overflowX: "auto" }}>
+                                  {item.key_exec && item.key_exec.slice(0, 2).map((exec, index) => (
+                                    <div key={index}>{exec.name}</div>
+                                  ))}
+                                </Typography>
                                 </Box>
                               </Box>
                             </>
@@ -667,25 +690,29 @@ const SearchCompanies = () => {
                     <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >{data.data[selectedItemIdx].ownership}</Typography>
                   </Box>
                 </Box>
+                {data.data[selectedItemIdx].headcount && 
                 <Box className="dialog-value-box">
                   <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Icon icon="ion:people-sharp" fontSize={32} color="#92C7F8" />
                   </Box>
                   <Box sx={{marginLeft:"15px", display:"flex", flexDirection:"column"}}>
                     <Typography sx={{color:"#D9D9D9", textAlign:"left"}} >Headcount</Typography>
-                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >{data.data[selectedItemIdx].headcount}</Typography>
+                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >{data.data[selectedItemIdx].headcount.toLocaleString()}</Typography>
                   </Box>
                 </Box>
+                }
+                {data.data[selectedItemIdx].market_cap && 
                 <Box className="dialog-value-box">
                   <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Icon icon="mdi:dollar" fontSize={32} color="#92C7F8" />
                   </Box>
-
+                
                   <Box sx={{marginLeft:"15px", display:"flex", flexDirection:"column"}}>
                     <Typography sx={{color:"#D9D9D9", textAlign:"left"}} >Market capitalization</Typography>
-                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >${data.data[selectedItemIdx].market_cap}</Typography>
+                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >${data.data[selectedItemIdx].market_cap.toLocaleString()}</Typography>
                   </Box>
                 </Box>
+                }
                 {data.data[selectedItemIdx].ebitda && 
                 <Box className="dialog-value-box-vertical">
                   <Box className='dialog-title'>

@@ -1,48 +1,17 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Autocomplete, TextField, Box, Typography } from '@mui/material';
 import debounce from 'lodash/debounce';
 import { Icon } from '@iconify/react';
-
+import GeographyDialog from './country';
 const Geography = ({setValues, values}) => {
 
 
-  const data = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua & Deps",
-    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas",
-    "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
-    "Bhutan", "Bolivia", "Bosnia Herzegovina", "Botswana", "Brazil", "Brunei",
-    "Bulgaria", "Burkina", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde",
-    "Central African Rep", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo",
-    "Congo {Democratic Rep}", "Costa Rica", "Croatia", "Cuba", "Cyprus",
-    "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
-    "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
-    "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia",
-    "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau",
-    "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
-    "Iran", "Iraq", "Ireland {Republic}", "Israel", "Italy", "Ivory Coast", "Jamaica",
-    "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea North", "Korea South",
-    "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho",
-    "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia",
-    "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands",
-    "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia",
-    "Montenegro", "Morocco", "Mozambique", "Myanmar, {Burma}", "Namibia", "Nauru",
-    "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway",
-    "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru",
-    "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russian Federation",
-    "Rwanda", "St Kitts & Nevis", "St Lucia", "Saint Vincent & the Grenadines", "Samoa",
-    "San Marino", "Sao Tome & Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles",
-    "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia",
-    "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Swaziland",
-    "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo",
-    "Tonga", "Trinidad & Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda",
-    "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
-    "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-  ];
-  
   const [openDropdown, setOpenDropdown] = useState(false);
 
+  const [geoDialog, setGeoDialog] = useState(false); 
+
   function handleDropdown(){
-    setOpenDropdown(!openDropdown)
+    setGeoDialog(!geoDialog)
   }
 
   const handleClick = (dat) => {
@@ -93,14 +62,6 @@ const Geography = ({setValues, values}) => {
         }
         
       </Box>
-      {openDropdown &&
-        <Box sx={{ maxHeight: '200px', overflowY: 'auto'}}>
-          {data.map((dat, index) => (
-            <Box sx={{backgroundColor:values.includes(dat)?'#B0B0B0':'#D9D9D9', paddingTop:"3px", paddingBottom:"3px", '&:hover': {backgroundColor: values.includes(dat)?'rgb(100,100,100)':'#B0B0B0' }}} onClick={() => handleClick(dat)} >{dat}
-            </Box>
-          ))}
-        </Box>
-      }
       <Box sx={{ display:"flex", alignContent:"flex-start", marginTop:"10px", flexWrap: "wrap", gap:'10px'}}>
         {values.map((value, index) => (
           <Box onClick={()=>{handleClick(value)}} sx={{backgroundColor:"#112232", color:"white", borderRadius:"3px", border:"1px solid #D9D9D9", padding:"5px", alignItems: "center", display:"flex", '&:hover': {backgroundColor:'#B0B0B0', cursor: 'pointer'  }}}>
@@ -118,6 +79,12 @@ const Geography = ({setValues, values}) => {
           </Box>
         ))}
       </Box>
+
+      {geoDialog && 
+      
+      <GeographyDialog open={geoDialog} onClose={()=>{setGeoDialog(false)}} selectedCountries={values} setSelectedCountries={setValues} ></GeographyDialog>
+      }
+
     </>
 
   );
