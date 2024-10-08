@@ -40,14 +40,14 @@ const SearchCompanies = () => {
     let sizefiltermin = 0
     let sizefiltermax = 999999999999
     if(size == sizeChoice[1]){
-      sizefiltermax = 500
+      sizefiltermax = 500000
     } 
     if(size == sizeChoice[2]){
-      sizefiltermin = 500
-      sizefiltermax = 1000
+      sizefiltermin = 500000
+      sizefiltermax = 1000000
     } 
     if(size == sizeChoice[3]){
-      sizefiltermin = 1000
+      sizefiltermin = 1000000
     } 
     let headmin = headcount[0]
     let headmax = headcount[1]
