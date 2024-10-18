@@ -138,7 +138,7 @@ const SearchInvestors = () => {
     if(investortype !== ""){
       const filteredList = investorChoice.filter(str => str.toLowerCase().includes(investortype.toLowerCase())).slice(0, 5);
       console.log(filteredList)
-      if(filteredList.length == 1 && sector == filteredList[filteredList.length-1]){
+      if(filteredList.length == 1 && investortype == filteredList[filteredList.length-1]){
         setAutocompleteInvestorType(null)
       }
       else{
