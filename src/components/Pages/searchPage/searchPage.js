@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Icon } from '@iconify/react';
 import SearchInvestors from './investors';
 import SearchCompanies from './companies';
+import Deals from './deals';
 
 const SearchPage = () => {
 
@@ -54,6 +55,9 @@ const SearchPage = () => {
       }
       {pageIdx === 1 &&
         <SearchInvestors></SearchInvestors>
+      }
+      {pageIdx === 2 &&
+        <Deals></Deals>
       }
     </Box>
   );
