@@ -119,23 +119,40 @@ const GeographyDialog = ({ open, onClose, selectedCountries, setSelectedCountrie
     const [selectedRegions, setSelectedRegions] = useState([]);
 
   
+    // Handle continent selection and auto-select regions
     const handleContinentChange = (event) => {
       const value = event.target.value;
       setSelectedContinents(value);
-      // Reset regions when continents are changed
-      setSelectedRegions([]);
+      
+      // Auto-select all regions from the selected continents
+      const regionsFromContinents = value.reduce((acc, continent) => {
+          return [...acc, ...continentsData[continent]];
+      }, []);
+      setSelectedRegions(regionsFromContinents);
 
-    };
-  
-    const handleRegionChange = (event) => {
+      // Auto-select all countries from the selected regions
+      const countriesFromRegions = regionsFromContinents.reduce((acc, region) => {
+          return [...acc, ...countriesData[region]];
+      }, []);
+      setSelectedCountries(countriesFromRegions);
+  };
+
+  // Handle region selection and auto-select countries
+  const handleRegionChange = (event) => {
       const value = event.target.value;
       setSelectedRegions(value);
 
-    };
-  
-    const handleCountryChange = (event) => {
+      // Auto-select all countries from the selected regions
+      const countriesFromRegions = value.reduce((acc, region) => {
+          return [...acc, ...countriesData[region]];
+      }, []);
+      setSelectedCountries(countriesFromRegions);
+  };
+
+  const handleCountryChange = (event) => {
       setSelectedCountries(event.target.value);
-    };
+  };
+  
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogTitle>Select Geography</DialogTitle>

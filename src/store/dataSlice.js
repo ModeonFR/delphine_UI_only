@@ -16,7 +16,15 @@ export const search = createAsyncThunk(
       return response;
     }
   );
-
+  
+  export const searchDeal = createAsyncThunk(
+    'search_deal/get',
+    async ({query, filters}) => {
+      const response = await dataService.searchDeal({query, filters});
+      return response;
+    }
+  );
+    
 
   const dataSlice = createSlice({
     name: 'data',
@@ -41,6 +49,17 @@ export const search = createAsyncThunk(
         state.status = 'succeeded';
       });
       builder.addCase(searchInvestor.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+      builder.addCase(searchDeal.pending, (state) => {
+        state.status = 'loading';
+      });
+      builder.addCase(searchDeal.fulfilled, (state, action) => {
+        state.data_investors = action.payload.data
+        state.status = 'succeeded';
+      });
+      builder.addCase(searchDeal.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       });

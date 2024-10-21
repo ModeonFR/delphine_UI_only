@@ -63,21 +63,52 @@ const Geography = ({setValues, values}) => {
         
       </Box>
       <Box sx={{ display:"flex", alignContent:"flex-start", marginTop:"10px", flexWrap: "wrap", gap:'10px'}}>
-        {values.map((value, index) => (
-          <Box onClick={()=>{handleClick(value)}} sx={{backgroundColor:"#112232", color:"white", borderRadius:"3px", border:"1px solid #D9D9D9", padding:"5px", alignItems: "center", display:"flex", '&:hover': {backgroundColor:'#B0B0B0', cursor: 'pointer'  }}}>
-            <Icon
-              icon="radix-icons:dot-filled"
-              fontSize={16}
-              color="#D9D9D9"
-            />
-            {value}
-            <Icon
-              icon="radix-icons:cross-2"
-              fontSize={16}
-              color="#D9D9D9"
-            />
-          </Box>
-        ))}
+      {values.slice(0, 8).map((value, index) => (
+        <Box 
+          key={index}
+          onClick={() => { handleClick(value); }}
+          sx={{
+            backgroundColor: "#112232",
+            color: "white",
+            borderRadius: "3px",
+            border: "1px solid #D9D9D9",
+            padding: "5px",
+            alignItems: "center",
+            display: "flex",
+            '&:hover': { backgroundColor: '#B0B0B0', cursor: 'pointer' }
+          }}
+        >
+          <Icon
+            icon="radix-icons:dot-filled"
+            fontSize={16}
+            color="#D9D9D9"
+          />
+          {value}
+          <Icon
+            icon="radix-icons:cross-2"
+            fontSize={16}
+            color="#D9D9D9"
+          />
+        </Box>
+      ))}
+
+      {values.length > 8 && (
+        <Box 
+          sx={{
+            backgroundColor: "#112232",
+            color: "white",
+            borderRadius: "3px",
+            border: "1px solid #D9D9D9",
+            padding: "5px",
+            alignItems: "center",
+            display: "flex",
+            '&:hover': { backgroundColor: '#B0B0B0', cursor: 'pointer' }
+          }}
+        >
+          +{values.length - 8}
+        </Box>
+      )}
+
       </Box>
 
       {geoDialog && 

@@ -35,7 +35,7 @@ const SearchInvestors = () => {
 
 
   function launchSearch(){
-    dispatch(searchInvestor({query:sector, filters:{example:exampleCompany, geography:geography, investortype:investortype, sector:sector}}))
+    dispatch(searchInvestor({query:sector, filters:{example:exampleCompany, geography:geography, investortype:investortype, sector:sector, name:companyName}}))
   }
 
 
@@ -108,7 +108,9 @@ const SearchInvestors = () => {
 
 
 
-
+  const [companyName, setCompanyName] = useState("");
+  const [autocompleteCompanies2, setAutocompleteCompanies2] = useState("");
+  const [debouncedCompany2, setDebouncedCompany2] = useState('');
 
   const [exampleCompany, setExampleCompany] = useState("");
   const [autocompleteCompanies, setAutocompleteCompanies] = useState("");
@@ -172,7 +174,24 @@ const SearchInvestors = () => {
     }
   }, [debouncedCompany]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedCompany2(companyName);
+    }, 200); // 200ms debounce
 
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [companyName]);
+
+  useEffect(() => {
+    if (debouncedCompany2) {
+      searchService.searchInvestorName({ query: debouncedCompany2 }).then((res) => {
+        console.log(res.data);
+        setAutocompleteCompanies2(res.data);
+      });
+    }
+  }, [debouncedCompany2]);
 
   const [city, setCity] = useState("");
   const [autocompleteCities, setAutocompleteCities] = useState("");
@@ -207,6 +226,51 @@ const SearchInvestors = () => {
                 <Typography >Filters</Typography>
                 <Button className='search-button' onClick={launchSearch}>search</Button>
               </Box>
+
+              <Box className='section-title-box'><Icon icon="mdi:bank-plus" fontSize={24} color='#92C7F8'/> <Typography className='section-title'>Company name</Typography></Box>
+              <TextField 
+                placeholder='Search company name'
+                fullWidth
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Icon icon="ion:search" fontSize={24} color='#D9D9D9'/>
+                    </InputAdornment>
+                  ),
+                  sx: {
+                    height: '37px', 
+                    color: '#D9D9D9',
+                  },
+                }}
+                sx={{
+                  '.MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#D9D9D9', 
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#D9D9D9',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#D9D9D9', 
+                    },
+                  },
+                  input: {
+                    color: '#D9D9D9', 
+                  },
+                }}
+              />
+              {autocompleteCompanies2 && companyName !== "" &&
+              <Box sx={{backgroundColor:"#D9D9D9"}}>
+                  {autocompleteCompanies2.map((s, index) => (
+                    <Box onClick={()=>{setCompanyName(s)}} key={index} value={s} sx={{'&:hover': {backgroundColor: '#B0B0B0', cursor: 'pointer', }}}>
+                      {s}
+                    </Box>
+                ))}
+              </Box>
+              }
+
               <Box className='section-title-box'><Icon icon="flowbite:edit-solid" fontSize={24} color='#92C7F8'/> <Typography className='section-title'>Sector</Typography></Box>
               <TextField 
                 placeholder='Select sector'

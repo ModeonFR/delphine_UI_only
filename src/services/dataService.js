@@ -53,6 +53,33 @@ async function searchInvestor({query, filters}) {
     return response.data;
 }
 
+async function searchDeal({query, filters}) {
+    let params = new URLSearchParams();
+    params.append('query', query);
+
+    for (const key in filters) {
+        if (filters.hasOwnProperty(key)) {
+            const value = filters[key];
+            
+            if (typeof value === 'object') {
+                params.append(key, JSON.stringify(value));
+            } else {
+                params.append(key, value);
+            }
+        }
+    }
+
+    let response = await axios.get(url + "/search_deal", {
+        params: params,
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    
+    return response.data;
+}
+
+
 async function searchCompanyName({query}) {
     let response = await axios.get(url + "/search_company_name", {
         params: { query: query },
@@ -88,7 +115,8 @@ const searchService={
     searchCompanyName:searchCompanyName,
     searchCityName:searchCityName,
     searchInvestorName:searchInvestorName,
-    searchInvestor:searchInvestor
+    searchInvestor:searchInvestor,
+    searchDeal:searchDeal
 };
 
 export default searchService;

@@ -195,6 +195,15 @@ const SearchCompanies = () => {
     }
   }, [debouncedCity]);
   
+  const formatMarketCap = (value) => {
+    if (value >= 1e9) {
+      return `${(value / 1e9).toFixed(2)} Bn`; // format in billions
+    } else if (value >= 1e6) {
+      return `${(value / 1e6).toFixed(2)} M`; // format in millions
+    }
+    return value.toLocaleString(); // if it's below 1 million, just format normally
+  };
+
   
   return (
           <Box className="search-container">
@@ -709,7 +718,7 @@ const SearchCompanies = () => {
                 
                   <Box sx={{marginLeft:"15px", display:"flex", flexDirection:"column"}}>
                     <Typography sx={{color:"#D9D9D9", textAlign:"left"}} >Market capitalization</Typography>
-                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >${data.data[selectedItemIdx].market_cap.toLocaleString()}</Typography>
+                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >${formatMarketCap(data.data[selectedItemIdx].market_cap)}</Typography>
                   </Box>
                 </Box>
                 }
