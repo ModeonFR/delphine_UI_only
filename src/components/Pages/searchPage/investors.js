@@ -515,8 +515,10 @@ const SearchInvestors = () => {
                                 </Typography>
 
                                 </Box>
-
+                                
+                               
                                 <Box className="result-column-value-big">
+                                {item.portoflio && 
                                   <Typography>
                                   {item.portoflio
                                     .slice(0, 3)
@@ -530,8 +532,10 @@ const SearchInvestors = () => {
                                       </React.Fragment>
                                     ))}
                                 </Typography>
-                                </Box>
+                                  }
 
+                                </Box>
+                              
                                 <Box className="result-column-value-medium">
                                   <Typography>
                                     {item.ceo}
