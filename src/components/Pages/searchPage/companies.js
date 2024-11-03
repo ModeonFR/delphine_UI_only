@@ -27,7 +27,7 @@ const SearchCompanies = () => {
   const data = useSelector((state) => state.data);
 
   const sizeChoice = ["Any", "0 - $500M", "$500M - $1Bn", "$1Bn+"]
-  const ownershipChoice = ["Any", "Public", "PE Owned", "Privately Owned (family)", "VC backed"]
+  const ownershipChoice = ["Any", "Public", "PE Backed", "Private", "Acquired"]
   const keypeopleChoice = ["Any","CEO", "CFO", "Head of M&A or Business Development or Strategy"]
 
 
@@ -85,8 +85,15 @@ const SearchCompanies = () => {
   useEffect(() => {
     if(selectedItemIdx){
       console.log(data.data[selectedItemIdx])
-      setStockMarket(data.data[selectedItemIdx].market_cap_tab.map(item => item.value))
-      setStockMarketTimestamp(data.data[selectedItemIdx].market_cap_tab.map(item => item.timestamp))
+      if(data.data[selectedItemIdx].market_cap_tab){
+        setStockMarket(data.data[selectedItemIdx].market_cap_tab.map(item => item.value))
+        setStockMarketTimestamp(data.data[selectedItemIdx].market_cap_tab.map(item => item.timestamp))
+      }
+      else{
+        setStockMarket(null)
+        setStockMarketTimestamp(null)
+      }
+
     }
 
 }, [selectedItemIdx]);
