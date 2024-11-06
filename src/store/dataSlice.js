@@ -28,7 +28,7 @@ export const search = createAsyncThunk(
 
   const dataSlice = createSlice({
     name: 'data',
-    initialState: { status: 'idle', data:[], data_investors:[] },
+    initialState: { status: 'idle', data:[], data_investors:[], data_deals:[] },
     extraReducers: (builder) => {
       builder.addCase(search.pending, (state) => {
         state.status = 'loading';
@@ -56,7 +56,7 @@ export const search = createAsyncThunk(
         state.status = 'loading';
       });
       builder.addCase(searchDeal.fulfilled, (state, action) => {
-        state.data_investors = action.payload.data
+        state.data_deals = action.payload.data
         state.status = 'succeeded';
       });
       builder.addCase(searchDeal.rejected, (state, action) => {

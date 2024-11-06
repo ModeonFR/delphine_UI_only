@@ -100,6 +100,26 @@ async function searchInvestorName({query}) {
     return response.data;
 }
 
+async function searchTargetName({query}) {
+    let response = await axios.get(url + "/search_target_name", {
+        params: { query: query },
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    return response.data;
+}
+
+async function searchBuyerName({query}) {
+    let response = await axios.get(url + "/search_buyer_name", {
+        params: { query: query },
+        headers: {
+            'ngrok-skip-browser-warning': 'true'
+        }
+    });
+    return response.data;
+}
+
 async function searchCityName({query}) {
     let response = await axios.get(url + "/search_city", {
         params: { query: query },
@@ -116,7 +136,9 @@ const searchService={
     searchCityName:searchCityName,
     searchInvestorName:searchInvestorName,
     searchInvestor:searchInvestor,
-    searchDeal:searchDeal
+    searchDeal:searchDeal,
+    searchTargetName:searchTargetName,
+    searchBuyerName:searchBuyerName
 };
 
 export default searchService;
