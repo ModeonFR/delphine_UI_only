@@ -506,13 +506,19 @@ const SearchInvestors = () => {
                                 </Box>
 
                                 <Box className="result-column-value-big">
-                                  <Typography>{item.profile}</Typography>
+                                  <Typography>{item.profile ? item.profile : "NA"}</Typography>
                                 </Box>
 
                                 <Box className="result-column-value-medium">
-                                <Typography>
-                                  {!/\d/.test(item.country) && item.country}
-                                </Typography>
+                                  {item.country ? 
+                                  <Typography>
+                                    {!/\d/.test(item.country) ? item.country : 'NA'}
+                                  </Typography>
+                                  :
+                                  <Typography>NA</Typography>
+                                
+                                }
+
 
                                 </Box>
                                 
@@ -538,14 +544,16 @@ const SearchInvestors = () => {
                               
                                 <Box className="result-column-value-medium">
                                   <Typography>
-                                    {item.ceo}
+                                    {item.ceo ? item.ceo : "NA"}
                                   </Typography>
                                   </Box>
                                 <Box className="result-column-value-big">
-                                  {item.website && 
+                                  {item.website ? 
                                   <Typography>
                                     {item.website.length > 25 ? `${item.website.substring(0, 25)}...` : item.website}
                                   </Typography>
+                                  :
+                                  <Typography>NA</Typography>
                                   }
                                 </Box>
 

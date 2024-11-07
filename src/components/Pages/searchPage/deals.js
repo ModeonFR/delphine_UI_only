@@ -618,16 +618,20 @@ const Deals = () => {
                           <>
                             <Box  className="result-right-values" onClick={()=>{setSelectedItemIdx(index)}}  sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0)" }}>
                               <Box className="result-column-value-medium" sx={{wordBreak:"break-word", whiteSpace:'normal'}}>
-                                {item.buyer && 
+                                {item.buyer ? 
                                   <Typography>{item.buyer.split(",")[0].slice(0, 80)}</Typography>
+                                  :
+                                  <Typography>NA</Typography>
                                 }
                               </Box>
 
 
                               <Box className="result-column-value-medium"  sx={{wordBreak:"break-word", whiteSpace:'normal'}}>
-                                {item.seller && 
+                                {item.seller ? 
        
                                   <Typography>{item.seller.split(",")[0].slice(0, 80)}</Typography>
+                                  :
+                                  <Typography>NA</Typography>
                                  }
                               </Box>
 
@@ -636,8 +640,10 @@ const Deals = () => {
                               </Box>
 
                               <Box className="result-column-value-medium">
-                                {item.deal_value && 
+                                {item.deal_value ?
                                   <Typography>${item.deal_value}</Typography>
+                                  :
+                                  <Typography>NA</Typography>
                                 }
                               </Box>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback  } from 'react';
-import {Box,Typography,Button, TextField, InputAdornment, Select, FormControl, MenuItem, Slider, Checkbox, CircularProgress } from '@mui/material';
+import {Box,Typography,Button, TextField, InputAdornment, Select, FormControl, MenuItem, Slider, Checkbox, CircularProgress, } from '@mui/material';
 import { search } from '../../../store/dataSlice';
 import searchService from '../../../services/dataService';
 import { useSelector, useDispatch } from 'react-redux';
@@ -620,45 +620,69 @@ const SearchCompanies = () => {
                                 </Box>
 
                                 <Box className="result-column-value">
-                                {item.city && !/\d/.test(item.city) ? 
-                                  <Typography>{item.city}, {item.geography.replace("United States", "USA")}</Typography>
-                                  :
-                                  <Typography>{item.geography.replace("United States", "USA")}</Typography>
+                                  {item.geography ? 
+                                    <>
+                                    {item.city && !/\d/.test(item.city) ? 
+                                      <Typography>{item.city}, {item.geography.replace("United States", "USA")}</Typography>
+                                      :
+                                      <Typography>{item.geography.replace("United States", "USA")}</Typography>
+                                    }
+                                    </>
+                                  : 
+                                    <Typography>NA</Typography>
                                   }
                                   
                                 </Box>
 
                                 <Box className="result-column-value-medium">
-                                  {item.website && 
+                                  {item.website ?
                                   <Typography>
                                     {item.website.length > 25 ? `${item.website.substring(0, 25)}...` : item.website}
                                   </Typography>
+                                  :
+                                  <Typography>NA</Typography>
                                   }
                                 </Box>
 
                                 <Box className="result-column-value">
-                                  {item.revenues && item.revenues[0] && Math.abs(parseInt(item.revenues[0].toString().split('.')[0])) > 1000000 ?
-                                  <Typography>{item.revenues && item.revenues[0] && "$"+ (parseInt(item.revenues[0].toString().split('.')[0])/1000000).toFixed(2) + "Bn"}</Typography>
-                                  :
-                                  <Typography>{item.revenues && item.revenues[0] && "$"+ (parseInt(item.revenues[0].toString().split('.')[0])/1000).toFixed(0) + "M"}</Typography>
-                                  }
+                                 {item.revenues && item.revenues[0]  ? 
+                                    <>
+                                    {item.revenues && item.revenues[0] && Math.abs(parseInt(item.revenues[0].toString().split('.')[0])) > 1000000 ?
+                                    <Typography>{item.revenues && item.revenues[0] && "$"+ (parseInt(item.revenues[0].toString().split('.')[0])/1000000).toFixed(2) + "Bn"}</Typography>
+                                    :
+                                    <Typography>{item.revenues && item.revenues[0] && "$"+ (parseInt(item.revenues[0].toString().split('.')[0])/1000).toFixed(0) + "M"}</Typography>
+                                    }
+                                    </>
+                                 : 
+                                    <Typography>NA</Typography>
+                                }
                                   </Box>
                                 <Box className="result-column-value">
-                                  {item.ebitda && Math.abs(parseInt(item.ebitda.toString().split('.')[0])) > 1000000 ?
-                                  <Typography>{item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) && "$"+ (parseInt(item.ebitda.toString().split('.')[0])/1000000).toFixed(2) + "Bn"}</Typography>
-                                  :
-                                  <Typography>{item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) && "$"+ (parseInt(item.ebitda.toString().split('.')[0])/1000).toFixed(0) + "M"}</Typography>
+                                  {item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) ?
+                                    <>
+                                    {item.ebitda && Math.abs(parseInt(item.ebitda.toString().split('.')[0])) > 1000000 ?
+                                    <Typography>{item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) && "$"+ (parseInt(item.ebitda.toString().split('.')[0])/1000000).toFixed(2) + "Bn"}</Typography>
+                                    :
+                                    <Typography>{item.ebitda && !isNaN(parseInt(item.ebitda.toString().split('.')[0])) && "$"+ (parseInt(item.ebitda.toString().split('.')[0])/1000).toFixed(0) + "M"}</Typography>
+                                    }
+                                    </>
+                                    :
+                                    <Typography>NA</Typography>
                                   }
                                 </Box>
                                 <Box className="result-column-value">
-                                  <Typography>{item.headcount && item.headcount.toLocaleString()}</Typography>
+                                  <Typography>{item.headcount ? item.headcount.toLocaleString() : "NA"}</Typography>
                                 </Box>
                                 <Box className="result-column-value-medium">
-                                <Typography sx={{ maxWidth: "150px", overflowX: "auto" }}>
-                                  {item.key_exec && item.key_exec.slice(0, 2).map((exec, index) => (
-                                    <div key={index}>{exec.name}</div>
-                                  ))}
-                                </Typography>
+                                  {item.key_exec ? 
+                                  <Typography sx={{ maxWidth: "150px", overflowX: "auto" }}>
+                                    {item.key_exec && item.key_exec.slice(0, 2).map((exec, index) => (
+                                      <div key={index}>{exec.name}</div>
+                                    ))}
+                                  </Typography>
+                                  :
+                                  <Typography>NA</Typography>
+                                  }
                                 </Box>
                               </Box>
                             </>
@@ -713,7 +737,7 @@ const SearchCompanies = () => {
                   </Box>
                   <Box sx={{marginLeft:"15px", display:"flex", flexDirection:"column"}}>
                     <Typography sx={{color:"#D9D9D9", textAlign:"left"}} >Headcount</Typography>
-                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >{data.data[selectedItemIdx].headcount.toLocaleString()}</Typography>
+                    <Typography sx={{color:"#D9D9D9", textAlign:"left", fontWeight:"bold"}} >{data.data[selectedItemIdx].headcount?data.data[selectedItemIdx].headcount.toLocaleString():"NA"}</Typography>
                   </Box>
                 </Box>
                 }
