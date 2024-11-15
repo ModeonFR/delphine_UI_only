@@ -7,8 +7,9 @@ import { Icon } from '@iconify/react';
 import Geography from '../../widgets/geography';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart, lineElementClasses } from '@mui/x-charts/LineChart';
-import GeographyDialog from '../../widgets/country';
+import { incrementPage, decrementPage } from '../../../store/dataSlice';
 import _ from 'lodash';
+import { debounce } from 'lodash';
 
 const SearchCompanies = () => {
   const dispatch = useDispatch();
@@ -35,8 +36,19 @@ const SearchCompanies = () => {
       console.log(data.data)
   }, [data]);
 
+  const timeoutRef = useRef(null);
+  const debouncedLaunchSearch = (page) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
 
-  function launchSearch(){
+    timeoutRef.current = setTimeout(() => {
+      launchSearch(page)
+    }, 500); 
+  };
+
+  
+  function launchSearch(page){
     let sizefiltermin = 0
     let sizefiltermax = 999999999999
     if(size == sizeChoice[1]){
@@ -64,7 +76,7 @@ const SearchCompanies = () => {
     if(keypeople.includes("M&A")){
       keyp = "M&A"
     }
-    dispatch(search({query:query, filters:{example:exampleCompany, rumors:rumors, geography:geography, revenues_min:sizefiltermin, revenues_max:sizefiltermax, headcount_min:headmin, headcount_max:headmax, ownership:ownership, keypeople:keyp, city:city}}))
+    dispatch(search({query:query, filters:{example:exampleCompany, rumors:rumors, geography:geography, revenues_min:sizefiltermin, revenues_max:sizefiltermax, headcount_min:headmin, headcount_max:headmax, ownership:ownership, keypeople:keyp, city:city, page:page}}))
   }
 
 
@@ -79,6 +91,7 @@ const SearchCompanies = () => {
   const [selectedItemIdx, setSelectedItemIdx] = useState(null);
   const [stockMarket, setStockMarket] = useState([]);
   const [stockMarketTimestamp, setStockMarketTimestamp] = useState([]);
+
 
 
 
@@ -118,8 +131,12 @@ const SearchCompanies = () => {
     const ref3 = resultLeftValuesContainerRef.current;
   
     // Sync horizontal scrollbar with header
-    const syncHorizontalScroll = () => {
+    const syncHorizontalScrollFromRef2 = () => {
       ref1.scrollLeft = ref2.scrollLeft;
+    };
+  
+    const syncHorizontalScrollFromRef1 = () => {
+      ref2.scrollLeft = ref1.scrollLeft;
     };
   
     // Sync vertical scroll from ref2 to ref3
@@ -134,19 +151,20 @@ const SearchCompanies = () => {
   
     if (ref1 && ref2 && ref3) {
       // Add scroll event listeners
-      ref2.addEventListener('scroll', syncHorizontalScroll);
+      ref2.addEventListener('scroll', syncHorizontalScrollFromRef2);
+      ref1.addEventListener('scroll', syncHorizontalScrollFromRef1);
       ref2.addEventListener('scroll', syncVerticalScrollFromRef2);
       ref3.addEventListener('scroll', syncVerticalScrollFromRef3);
   
       // Cleanup function to remove event listeners
       return () => {
-        ref2.removeEventListener('scroll', syncHorizontalScroll);
+        ref2.removeEventListener('scroll', syncHorizontalScrollFromRef2);
+        ref1.removeEventListener('scroll', syncHorizontalScrollFromRef1);
         ref2.removeEventListener('scroll', syncVerticalScrollFromRef2);
         ref3.removeEventListener('scroll', syncVerticalScrollFromRef3);
       };
     }
   }, []);
-
 
 
 
@@ -217,7 +235,7 @@ const SearchCompanies = () => {
             <Box className="filter-box">
               <Box className='search-title'>
                 <Typography >Filters</Typography>
-                <Button className='search-button' onClick={launchSearch}>search</Button>
+                <Button className='search-button' onClick={()=>{launchSearch(0)}}>search</Button>
               </Box>
               <Box className='section-title-box'><Icon icon="flowbite:edit-solid" fontSize={24} color='#92C7F8'/> <Typography className='section-title'>Sector</Typography></Box>
               <TextField 
@@ -555,7 +573,7 @@ const SearchCompanies = () => {
                             <Box className="result-left-values" sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0)" }}>
                               <Box className="result-column-value">
                                 <Checkbox className="search-checkbox"  checked={checkedItems[index] || false} onChange={handleCheckboxChange(index)} sx={{ '&.Mui-checked': {color: '#D9D9D9',},'&.MuiCheckbox-root': {borderColor: '#D9D9D9',},'& .MuiSvgIcon-root': {border: `1px solid #D9D9D9`, },}}/>
-                                <Typography className="result-column-title-text" >{index+1}</Typography>
+                                <Typography className="result-column-title-text" >{index+1+20*data.page}</Typography>
                               </Box>
                               <Box className="result-column-value">
                                 <Typography>{item.company_short_name}</Typography>
@@ -567,6 +585,9 @@ const SearchCompanies = () => {
                         }
                         </>
                       }
+                    </Box>
+                    <Box sx={{ marginTop:'auto', display:'flex', alignItems:"center", gap:"8px", marginBottom:"5px", marginRight:"5px", maxHeight:"40px", minHeight:"40px"}}>
+                        {/* EMPTY SPACE */}
                     </Box>
                   </Box>
                   <Box className="result-box-right">
@@ -622,12 +643,17 @@ const SearchCompanies = () => {
                                 <Box className="result-column-value">
                                   {item.geography ? 
                                     <>
-                                    {item.city && !/\d/.test(item.city) ? 
-                                      <Typography>{item.city}, {item.geography.replace("United States", "USA")}</Typography>
-                                      :
-                                      <Typography>{item.geography.replace("United States", "USA")}</Typography>
-                                    }
-                                    </>
+       
+                                      { !/\d/.test(item.geography) ? 
+                                        <Typography>{item.geography.replace("United States", "USA")}</Typography>
+                                        :
+                                        <Typography>NA</Typography>
+
+                                      }
+                                        
+                                      </>
+                                      
+                            
                                   : 
                                     <Typography>NA</Typography>
                                   }
@@ -695,6 +721,34 @@ const SearchCompanies = () => {
 
                  
                      
+                    </Box>
+
+                    <Box sx={{ marginTop:'auto', display:'flex', alignItems:"center", gap:"8px", marginBottom:"5px", marginRight:"5px", maxHeight:"40px", minHeight:"40px"}}>
+                      <Typography sx={{textAlign:"right", marginLeft:"auto"}}>Page {data.page+1}</Typography>
+                      <Button 
+                        sx={{ backgroundColor: "#D9D9D9", color: "#112232" }} 
+                        onClick={() => {
+                          if(data.page > 0){
+                            debouncedLaunchSearch(data.page-1)
+                            dispatch(decrementPage())
+                          }
+                          
+                        }}
+                      >
+                        Prev
+                      </Button>
+                      <Button 
+                        sx={{ backgroundColor: "#D9D9D9", color: "#112232" }} 
+                        onClick={() => {
+                          if(data.page < data.max_page){
+                            debouncedLaunchSearch(data.page + 1)
+                            dispatch(incrementPage())
+                          }
+                        }}
+                    >
+                        Next
+                    </Button>
+                      
                     </Box>
                   </Box>
                 </Box>

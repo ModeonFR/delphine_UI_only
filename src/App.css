@@ -399,9 +399,12 @@ display: flex;
   flex-direction: column;
   overflow-y: auto; 
   overflow-x: auto;
-  touch-action: pan-y; 
   max-height: 100%;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
+/*  touch-action: pan-y; */
+
 .result-left-values{
 
   display: flex;
@@ -422,15 +425,9 @@ display: flex;
 
 .result-right-header {
   overflow-x: auto;
+  overflow-y: hidden;
   display: flex;
   min-height: 50px;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer and Edge */
-}
-
-/* Hide scrollbar for Webkit browsers */
-.result-right-header::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
 }
 
 /* SEARCH PAGE - Dialog box */

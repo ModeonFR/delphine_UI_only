@@ -6,6 +6,7 @@ import { Icon } from '@iconify/react';
 import Geography from '../../widgets/geography';
 import searchService from '../../../services/dataService';
 import { PieChart } from '@mui/x-charts/PieChart';
+import { incrementPage, decrementPage } from '../../../store/dataSlice';
 
 const pieParams = {
   height: 100,
@@ -34,8 +35,19 @@ const SearchInvestors = () => {
   }, [data]);
 
 
-  function launchSearch(){
-    dispatch(searchInvestor({query:sector, filters:{example:exampleCompany, geography:geography, investortype:investortype, sector:sector, name:companyName}}))
+  const timeoutRef = useRef(null);
+  const debouncedLaunchSearch = (page) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      launchSearch(page)
+    }, 500); 
+  };
+
+  function launchSearch(page){
+    dispatch(searchInvestor({query:sector, filters:{example:exampleCompany, geography:geography, investortype:investortype, sector:sector, name:companyName, page:page}}))
   }
 
 
@@ -77,8 +89,12 @@ const SearchInvestors = () => {
     const ref3 = resultLeftValuesContainerRef.current;
   
     // Sync horizontal scrollbar with header
-    const syncHorizontalScroll = () => {
+    const syncHorizontalScrollFromRef2 = () => {
       ref1.scrollLeft = ref2.scrollLeft;
+    };
+  
+    const syncHorizontalScrollFromRef1 = () => {
+      ref2.scrollLeft = ref1.scrollLeft;
     };
   
     // Sync vertical scroll from ref2 to ref3
@@ -93,18 +109,21 @@ const SearchInvestors = () => {
   
     if (ref1 && ref2 && ref3) {
       // Add scroll event listeners
-      ref2.addEventListener('scroll', syncHorizontalScroll);
+      ref2.addEventListener('scroll', syncHorizontalScrollFromRef2);
+      ref1.addEventListener('scroll', syncHorizontalScrollFromRef1);
       ref2.addEventListener('scroll', syncVerticalScrollFromRef2);
       ref3.addEventListener('scroll', syncVerticalScrollFromRef3);
   
       // Cleanup function to remove event listeners
       return () => {
-        ref2.removeEventListener('scroll', syncHorizontalScroll);
+        ref2.removeEventListener('scroll', syncHorizontalScrollFromRef2);
+        ref1.removeEventListener('scroll', syncHorizontalScrollFromRef1);
         ref2.removeEventListener('scroll', syncVerticalScrollFromRef2);
         ref3.removeEventListener('scroll', syncVerticalScrollFromRef3);
       };
     }
   }, []);
+
 
 
 
@@ -224,10 +243,10 @@ const SearchInvestors = () => {
             <Box className="filter-box">
               <Box className='search-title'>
                 <Typography >Filters</Typography>
-                <Button className='search-button' onClick={launchSearch}>search</Button>
+                <Button className='search-button' onClick={()=>{launchSearch(0)}}>search</Button>
               </Box>
 
-              <Box className='section-title-box'><Icon icon="mdi:bank-plus" fontSize={24} color='#92C7F8'/> <Typography className='section-title'>Company name</Typography></Box>
+              <Box className='section-title-box'><Icon icon="mdi:bank-plus" fontSize={24} color='#92C7F8'/> <Typography className='section-title'>Investor name</Typography></Box>
               <TextField 
                 placeholder='Search company name'
                 fullWidth
@@ -438,7 +457,7 @@ const SearchInvestors = () => {
                             <Box className="result-left-values" sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0)" }}>
                               <Box className="result-column-value">
                                 <Checkbox className="search-checkbox"  checked={checkedItems[index] || false} onChange={handleCheckboxChange(index)} sx={{ '&.Mui-checked': {color: '#D9D9D9',},'&.MuiCheckbox-root': {borderColor: '#D9D9D9',},'& .MuiSvgIcon-root': {border: `1px solid #D9D9D9`, },}}/>
-                                <Typography className="result-column-title-text" >{index+1}</Typography>
+                                <Typography className="result-column-title-text" >{index+1+20*data.page}</Typography>
                               </Box>
                               <Box className="result-column-value">
                                 <Typography>{item.name}</Typography>
@@ -451,6 +470,9 @@ const SearchInvestors = () => {
                         </>
                       }
                     </Box>
+                    <Box sx={{ marginTop:'auto', display:'flex', alignItems:"center", gap:"8px", marginBottom:"5px", marginRight:"5px", maxHeight:"40px", minHeight:"40px"}}>
+                        {/* EMPTY SPACE */}
+                    </Box>
                   </Box>
                   <Box className="result-box-right">
                     <Box className="result-right-header" ref={rightHeaderRef}>
@@ -462,6 +484,9 @@ const SearchInvestors = () => {
                       </Box>
                       <Box className="result-column-title-medium">
                         <Typography className="result-column-title-text" >Headquarters</Typography>
+                      </Box>
+                      <Box className="result-column-title-medium">
+                        <Typography className="result-column-title-text" >Investor type</Typography>
                       </Box>
                       <Box className="result-column-title-big">
                         <Typography className="result-column-title-text" >Portfolio</Typography>
@@ -510,19 +535,38 @@ const SearchInvestors = () => {
                                 </Box>
 
                                 <Box className="result-column-value-medium">
+                                <Box className="result-column-value">
                                   {item.country ? 
-                                  <Typography>
-                                    {!/\d/.test(item.country) ? item.country : 'NA'}
-                                  </Typography>
-                                  :
-                                  <Typography>NA</Typography>
-                                
-                                }
+                                    <>
+       
+                                      { !/\d/.test(item.country) ? 
+                                        <Typography>{item.country.replace("United States", "USA")}</Typography>
+                                        :
+                                        <Typography>NA</Typography>
+
+                                      }
+                                        
+                                      </>
+                                      
+                            
+                                  : 
+                                    <Typography>NA</Typography>
+                                  }
+                                  
+                                </Box>
 
 
                                 </Box>
                                 
-                               
+                                <Box className="result-column-value-medium">
+                                {item.investor_type && 
+                                  <Typography>
+                                  {item.investor_type}
+                                </Typography>
+                                  }
+
+                                </Box>
+
                                 <Box className="result-column-value-big">
                                 {item.portoflio && 
                                   <Typography>
@@ -569,6 +613,33 @@ const SearchInvestors = () => {
                  
                      
                     </Box>
+                    <Box sx={{ marginTop:'auto', display:'flex', alignItems:"center", gap:"8px", marginBottom:"5px", marginRight:"5px", maxHeight:"40px", minHeight:"40px"}}>
+                <Typography sx={{textAlign:"right", marginLeft:"auto"}}>Page {data.page+1}</Typography>
+                <Button 
+                  sx={{ backgroundColor: "#D9D9D9", color: "#112232" }} 
+                  onClick={() => {
+                    if(data.page > 0){
+                      debouncedLaunchSearch(data.page-1)
+                      dispatch(decrementPage())
+                    }
+                    
+                  }}
+                >
+                  Prev
+                </Button>
+                <Button 
+                  sx={{ backgroundColor: "#D9D9D9", color: "#112232" }} 
+                  onClick={() => {
+                    if(data.page < data.max_page){
+                      debouncedLaunchSearch(data.page + 1)
+                      dispatch(incrementPage())
+                    }
+                  }}
+              >
+                  Next
+              </Button>
+                
+              </Box>
                   </Box>
                 </Box>
 
@@ -756,7 +827,7 @@ const SearchInvestors = () => {
                 }
                 </Box>
               </Box>
-              
+
             </Box>
              }
           </Box>

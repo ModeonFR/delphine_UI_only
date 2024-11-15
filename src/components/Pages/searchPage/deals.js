@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Icon } from '@iconify/react';
 import Geography from '../../widgets/geography';
 import searchService from '../../../services/dataService';
-import { PieChart } from '@mui/x-charts/PieChart';
+import { incrementPage, decrementPage } from '../../../store/dataSlice';
 
 const pieParams = {
   height: 100,
@@ -40,8 +40,20 @@ const Deals = () => {
   }, [data]);
 
 
-  function launchSearch(){
-    dispatch(searchDeal({query:sector, filters:{name_target:companyName, geography_target:geography, sector_target:sector,  name_buyer:companyName2, investortype:investortype, dealsize:dealSize, transactiontype:transactionType}}))
+  const timeoutRef = useRef(null);
+  const debouncedLaunchSearch = (page) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      launchSearch(page)
+    }, 500); 
+  };
+
+
+  function launchSearch(page){
+    dispatch(searchDeal({query:sector, filters:{name_target:companyName, geography_target:geography, sector_target:sector,  name_buyer:companyName2, investortype:investortype, dealsize:dealSize, transactiontype:transactionType, page:page}}))
   }
 
 
@@ -83,8 +95,12 @@ const Deals = () => {
     const ref3 = resultLeftValuesContainerRef.current;
   
     // Sync horizontal scrollbar with header
-    const syncHorizontalScroll = () => {
+    const syncHorizontalScrollFromRef2 = () => {
       ref1.scrollLeft = ref2.scrollLeft;
+    };
+  
+    const syncHorizontalScrollFromRef1 = () => {
+      ref2.scrollLeft = ref1.scrollLeft;
     };
   
     // Sync vertical scroll from ref2 to ref3
@@ -99,13 +115,15 @@ const Deals = () => {
   
     if (ref1 && ref2 && ref3) {
       // Add scroll event listeners
-      ref2.addEventListener('scroll', syncHorizontalScroll);
+      ref2.addEventListener('scroll', syncHorizontalScrollFromRef2);
+      ref1.addEventListener('scroll', syncHorizontalScrollFromRef1);
       ref2.addEventListener('scroll', syncVerticalScrollFromRef2);
       ref3.addEventListener('scroll', syncVerticalScrollFromRef3);
   
       // Cleanup function to remove event listeners
       return () => {
-        ref2.removeEventListener('scroll', syncHorizontalScroll);
+        ref2.removeEventListener('scroll', syncHorizontalScrollFromRef2);
+        ref1.removeEventListener('scroll', syncHorizontalScrollFromRef1);
         ref2.removeEventListener('scroll', syncVerticalScrollFromRef2);
         ref3.removeEventListener('scroll', syncVerticalScrollFromRef3);
       };
@@ -225,7 +243,7 @@ const Deals = () => {
             <Box className="filter-box">
               <Box className='search-title'>
                 <Typography >Filters</Typography>
-                <Button className='search-button' onClick={launchSearch}>search</Button>
+                <Button className='search-button' onClick={()=>{launchSearch(0)}}>search</Button>
               </Box>
 
 
@@ -563,7 +581,7 @@ const Deals = () => {
                           <Box className="result-left-values" sx={{ backgroundColor: index % 2 !== 0 ? "rgba(0,0,0,0)":"rgba(25,25,25,0)" }}>
                             <Box className="result-column-value">
                               <Checkbox className="search-checkbox"  checked={checkedItems[index] || false} onChange={handleCheckboxChange(index)} sx={{ '&.Mui-checked': {color: '#D9D9D9',},'&.MuiCheckbox-root': {borderColor: '#D9D9D9',},'& .MuiSvgIcon-root': {border: `1px solid #D9D9D9`, },}}/>
-                              <Typography className="result-column-title-text" >{index+1}</Typography>
+                              <Typography className="result-column-title-text" >{index+1+20*data.page}</Typography>
                             </Box>
                             <Box className="result-column-value">
                               <Typography>{item.target}</Typography>
@@ -576,6 +594,9 @@ const Deals = () => {
                       </>
                     }
                   </Box>
+                  <Box sx={{ marginTop:'auto', display:'flex', alignItems:"center", gap:"8px", marginBottom:"5px", marginRight:"5px", maxHeight:"40px", minHeight:"40px"}}>
+                        {/* EMPTY SPACE */}
+                    </Box>
                 </Box>
                 <Box className="result-box-right">
                   <Box className="result-right-header" ref={rightHeaderRef}>
@@ -677,7 +698,35 @@ const Deals = () => {
               
                   
                   </Box>
+                  <Box sx={{ marginTop:'auto', display:'flex', alignItems:"center", gap:"8px", marginBottom:"5px", marginRight:"5px", maxHeight:"40px", minHeight:"40px"}}>
+                    <Typography sx={{textAlign:"right", marginLeft:"auto"}}>Page {data.page+1}</Typography>
+                    <Button 
+                      sx={{ backgroundColor: "#D9D9D9", color: "#112232" }} 
+                      onClick={() => {
+                        if(data.page > 0){
+                          debouncedLaunchSearch(data.page-1)
+                          dispatch(decrementPage())
+                        }
+                        
+                      }}
+                    >
+                      Prev
+                    </Button>
+                    <Button 
+                      sx={{ backgroundColor: "#D9D9D9", color: "#112232" }} 
+                      onClick={() => {
+                        if(data.page < data.max_page){
+                          debouncedLaunchSearch(data.page + 1)
+                          dispatch(incrementPage())
+                        }
+                      }}
+                  >
+                      Next
+                  </Button>
+                    
+                  </Box>
                 </Box>
+
               </Box>
 
 
