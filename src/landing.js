@@ -10,7 +10,7 @@ const Landing = () => {
    
   return (
     <Box className="container">
-      {user.connected || true ? (
+      {user.connected  ? (
         <MainPage></MainPage>
       ) : (
         <LoginPage></LoginPage>
